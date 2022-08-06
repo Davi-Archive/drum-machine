@@ -1,6 +1,6 @@
 import React from 'react';
 import ReactDOM from 'react-dom/client';
-import './index.css';
+
 
 const bankOne = [
   {
@@ -168,7 +168,7 @@ const DumControle = ({ stop, name, power, volume, handleVolumeChange, changeSoun
   </div>
 );
 
-export default function App() {
+function App() {
   const [power, setPower] = React.useState(true);
   const [volume, setVolume] = React.useState(1);
   const [soundName, setSoundName] = React.useState("");
@@ -180,11 +180,11 @@ export default function App() {
     keyTrigger.parentElement.style.color = "#ffffff"
   }
 
-    const deActivatedKey = (audio) => {
+    /* const deActivatedKey = (audio) => {
     audio.parentElement.style.backgroundColor = "#ffffff"
     audio.parentElement.style.color = "#000000"
   }
-
+ */
  const deactivateAudio = (audio) => {
    setTimeout(() => {
      audio.parentElement.style.backgroundColor = "#ffffff"
@@ -247,4 +247,6 @@ export default function App() {
   )
 };
 
-ReactDOM.render(<App/>, document.querySelector("#app"))
+
+const root = ReactDOM.createRoot(document.getElementById('root'));
+root.render(<App />);
