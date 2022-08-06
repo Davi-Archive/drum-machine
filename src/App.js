@@ -116,75 +116,137 @@ const bankTwo = [
   }
 ];
 
-const soundsName = {
-  heaterKit: "Heater Kit",
-  smoothPianoKit: "Smooth Piano Kit"
-};
-
 const soundsGroup = {
   heaterKit: bankOne,
   smoothPianoKit: bankTwo
-};
+}
 
-const KeyboardKey = ({ play, sound: { keyCode, keyTrigger, url } }) => {
-  React.useEffect(() =>{
-    const handleKeydown = (event) => {
-      if(event.keyCode === keyCode){
-        play(keyTrigger)
-      }
+const KeyboardKey = ({ play, deactivateAudio, sound: { id, keyTrigger, url, keyCode } }) => {
+  const handleKeydown = (e) => {
+    if(keyCode === e.keyCode) {
+      const audio = document.getElementById('keyTrigger');
+      play(keyTrigger, id);
+      deactivateAudio(audio)
     }
-    document.addEventListener("keydown", handleKeydown)
-  }, [])
-  return(
-    <button className="drum-pad" onClick={() => play(keyTrigger)}>
-      <audio class="clip" id={keyTrigger} src={url} />
-        {keyTrigger}
-    </button>
-  )
-}
-
-const Keyboard = ({ play , sounds }) => {
-  return sounds.map((sound) => <KeyboardKey play={play} sound={sound} />)
-}
-
-const DrumControl = () => {
-return (
-<div className="control">
-  <button onClick={changeSoundGroup}>Change Sound Group</button>
-</div>
-  )
- }
-
- const changeSoundGroup = () => {
-  if(soundType === "heaterKit"){
-    /* setSoundsType("smoothPianoKit"); */
-    setSounds(soundsGroup.smoothPianoKit);
-  } else {
-    /* setSoundsType("heaterKit"); */
-    setSounds(soundsGroup.heaterKit);
   }
+
+  React.useEffect(() => {
+      document.addEventListener('keydown', handleKeydown);
+  }, [])
+
+  return (
+    <button value="test" id={keyCode} className="drum-pad" onClick={() => play(keyTrigger, id)}>
+      <audio className="clip" src={url} id={keyTrigger} />
+      {keyTrigger}
+    </button>
+  );
 }
+
+const Keyboard = ({ sounds, play, power, deactivateAudio }) =>  (
+  <div className="keyboard">
+    {power
+      ? sounds.map((sound) => <KeyboardKey sound={sound} play={play} deactivateAudio={deactivateAudio} />)
+      : sounds.map((sound) => <KeyboardKey sound={{...sound, url: "#" }} play={play} deactivateAudio={deactivateAudio} />)
+    }
+  </div>
+);
+
+const DumControle = ({ stop, name, power, volume, handleVolumeChange, changeSoundGroup }) => (
+  <div className="controle">
+    <button onClick={stop}>Turn Power {power ? 'OFF' : 'ON'}</button>
+    <h2>Volume: %{Math.round(volume * 100)}</h2>
+    <input
+      max="1"
+      min="0"
+      step='0.01'
+      type="range"
+      value={volume}
+      onChange={handleVolumeChange}
+      />
+    <h2 id="display" >{name}</h2>
+    <button onClick={changeSoundGroup}>Change Sounds Group</button>
+  </div>
+);
 
 const App = () => {
+  const [power, setPower] = React.useState(true);
+  const [volume, setVolume] = React.useState(1);
+  const [soundName, setSoundName] = React.useState("");
   const [soundType, setSoundType] = React.useState("heaterKit");
-  const [sounds, setSounds] = React.useState(bankOne);
+  const [sounds, setSounds] = React.useState(soundsGroup[soundType]);
 
-
-
-
-  const play = (keyTrigger) => {
-    const audio = document.getElementById("keyTrigger");
-   audio.currentTime = 0;
-    audio.play()
+  const styleActiveKey = (keyTrigger) => {
+    keyTrigger.parentElement.style.backgroundColor = "#000000"
+    keyTrigger.parentElement.style.color = "#ffffff"
   }
+
+  const deActivatedKey = (audio) => {
+    audio.parentElement.style.backgroundColor = "#ffffff"
+    audio.parentElement.style.color = "#000000"
+  }
+
+ const deactivateAudio = (audio) => {
+   setTimeout(() => {
+     audio.parentElement.style.backgroundColor = "#ffffff"
+     audio.parentElement.style.color = "#000000"
+   }, 300)
+ }
+
+  const play = (keyTrigger, sound) => {
+    setSoundName(sound)
+    const audio = document.getElementById(keyTrigger);
+    styleActiveKey(audio);
+    audio.currentTime = 0;
+    audio.play();
+    deactivateAudio(audio)
+  }
+
+  const stop = () => {
+     setPower(!power)
+  }
+
+  const changeSoundGroup = () => {
+    setSoundName("")
+    if(soundType === "heaterKit"){
+        setSoundType("smoothPianoKit");
+        setSounds(soundsGroup.smoothPianoKit);
+    } else {
+        setSoundType("heaterKit");
+        setSounds(soundsGroup.heaterKit);
+    }
+  }
+
+  const handleVolumeChange = e => {
+    setVolume(e.target.value)
+  }
+
+  const setKeyVolume = () => {
+    const audioes = sounds.map(sound => document.getElementById(sound.keyTrigger));
+    audioes.forEach(audio => {
+      if(audio) {
+        audio.volume = volume;
+      }
+    })
+  }
+
   return (
     <div id="drum-machine">
-      <Keyboard play={play} sounds={sounds} />
-      <DrumControl changeSoundGroup={changeSoundGroup} />
+      {setKeyVolume()}
+      <div className="wrapper">
+        <Keyboard sounds={sounds} play={play} power={power} deactivateAudio={deactivateAudio} />
+        <DumControle
+          stop={stop}
+          power={power}
+          volume={volume}
+          name={soundName || soundName[soundType]}
+          changeSoundGroup={changeSoundGroup}
+          handleVolumeChange={handleVolumeChange}
+         />
+      </div>
     </div>
   )
-}
+};
 
-ReactDOM.render(<App />, document.getElementById("app"));
+ReactDOM.render(<App />, document.querySelector("#app"))
 
 export default App;
