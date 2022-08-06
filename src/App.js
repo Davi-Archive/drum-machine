@@ -1,6 +1,6 @@
-import './App.css';
-import React, { useState } from 'react';
-import  ReactDOM  from 'react-dom';
+import React from 'react';
+import ReactDOM from 'react-dom/client';
+import './index.css';
 
 const bankOne = [
   {
@@ -132,7 +132,7 @@ const KeyboardKey = ({ play, deactivateAudio, sound: { id, keyTrigger, url, keyC
 
   React.useEffect(() => {
       document.addEventListener('keydown', handleKeydown);
-  }, [])
+  }, )
 
   return (
     <button value="test" id={keyCode} className="drum-pad" onClick={() => play(keyTrigger, id)}>
@@ -168,7 +168,7 @@ const DumControle = ({ stop, name, power, volume, handleVolumeChange, changeSoun
   </div>
 );
 
-const App = () => {
+export default function App() {
   const [power, setPower] = React.useState(true);
   const [volume, setVolume] = React.useState(1);
   const [soundName, setSoundName] = React.useState("");
@@ -180,7 +180,7 @@ const App = () => {
     keyTrigger.parentElement.style.color = "#ffffff"
   }
 
-  const deActivatedKey = (audio) => {
+    const deActivatedKey = (audio) => {
     audio.parentElement.style.backgroundColor = "#ffffff"
     audio.parentElement.style.color = "#000000"
   }
@@ -247,6 +247,4 @@ const App = () => {
   )
 };
 
-ReactDOM.render(<App />, document.querySelector("#app"))
-
-export default App;
+ReactDOM.render(<App/>, document.querySelector("#app"))
