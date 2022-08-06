@@ -1,5 +1,6 @@
 import React from 'react';
 import ReactDOM from 'react-dom/client';
+import './index.css'
 
 
 const bankOne = [
@@ -129,7 +130,7 @@ const KeyboardKey = ({ play, deactivateAudio, sound: { id, keyTrigger, url, keyC
       deactivateAudio(audio)
     }
   }
-
+//Keydown sem precisar clicar
   React.useEffect(() => {
       document.addEventListener('keydown', handleKeydown);
   }, )
@@ -144,6 +145,7 @@ const KeyboardKey = ({ play, deactivateAudio, sound: { id, keyTrigger, url, keyC
 
 const Keyboard = ({ sounds, play, power, deactivateAudio }) =>  (
   <div className="keyboard">
+    {/* power true ou false para mudar link do array sound */}
     {power
       ? sounds.map((sound) => <KeyboardKey sound={sound} play={play} deactivateAudio={deactivateAudio} />)
       : sounds.map((sound) => <KeyboardKey sound={{...sound, url: "#" }} play={play} deactivateAudio={deactivateAudio} />)
@@ -168,7 +170,7 @@ const DumControle = ({ stop, name, power, volume, handleVolumeChange, changeSoun
   </div>
 );
 
-function App() {
+const App = () => {
   const [power, setPower] = React.useState(true);
   const [volume, setVolume] = React.useState(1);
   const [soundName, setSoundName] = React.useState("");
@@ -180,18 +182,17 @@ function App() {
     keyTrigger.parentElement.style.color = "#ffffff"
   }
 
-    /* const deActivatedKey = (audio) => {
+  const deActivatedKey = (audio) => {
     audio.parentElement.style.backgroundColor = "#ffffff"
     audio.parentElement.style.color = "#000000"
   }
- */
  const deactivateAudio = (audio) => {
    setTimeout(() => {
      audio.parentElement.style.backgroundColor = "#ffffff"
      audio.parentElement.style.color = "#000000"
    }, 300)
  }
-
+    /* audio controler player */
   const play = (keyTrigger, sound) => {
     setSoundName(sound)
     const audio = document.getElementById(keyTrigger);
@@ -201,8 +202,9 @@ function App() {
     deactivateAudio(audio)
   }
 
-  const stop = () => {
+  const stop = (audio) => {
      setPower(!power)
+     deActivatedKey(audio)
   }
 
   const changeSoundGroup = () => {
